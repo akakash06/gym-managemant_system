@@ -119,3 +119,160 @@ INSERT INTO Attendance (member_id, date, check_in_time, check_out_time) VALUES
 (6, '2024-04-06', '09:00:00', '10:30:00'),
 (7, '2024-04-07', '07:45:00', '09:15:00'),
 (8, '2024-04-08', '08:30:00', '10:00:00');
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE AddMember (
+    IN p_name VARCHAR(100),
+    IN p_phone VARCHAR(15),
+    IN p_email VARCHAR(100),
+    IN p_address VARCHAR(255),
+    IN p_join_date DATE
+)
+BEGIN
+    INSERT INTO Members (name, phone, email, address, join_date)
+    VALUES (p_name, p_phone, p_email, p_address, p_join_date);
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE UpdateMemberContact (
+    IN p_member_id INT,
+    IN p_phone VARCHAR(15),
+    IN p_email VARCHAR(100)
+)
+BEGIN
+    UPDATE Members
+    SET phone = p_phone, email = p_email
+    WHERE member_id = p_member_id;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE AddPayment (
+    IN p_member_id INT,
+    IN p_payment_date DATE,
+    IN p_amount DECIMAL(10, 2),
+    IN p_payment_method VARCHAR(50)
+)
+BEGIN
+    INSERT INTO Payments (member_id, payment_date, amount, payment_method)
+    VALUES (p_member_id, p_payment_date, p_amount, p_payment_method);
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE AssignWorkoutPlan (
+    IN p_member_id INT,
+    IN p_trainer_id INT,
+    IN p_plan_description TEXT,
+    IN p_created_on DATE
+)
+BEGIN
+    INSERT INTO Workout_Plans (member_id, trainer_id, plan_description, created_on)
+    VALUES (p_member_id, p_trainer_id, p_plan_description, p_created_on);
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE GetAttendanceReport (
+    IN p_member_id INT,
+    IN p_start_date DATE,
+    IN p_end_date DATE
+)
+BEGIN
+    SELECT * FROM Attendance
+    WHERE member_id = p_member_id
+      AND date BETWEEN p_start_date AND p_end_date;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE GetActiveMemberships (
+    IN p_date DATE
+)
+BEGIN
+    SELECT * FROM Memberships
+    WHERE p_date BETWEEN start_date AND end_date;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE GetRevenueReport (
+    IN p_start_date DATE,
+    IN p_end_date DATE
+)
+BEGIN
+    SELECT SUM(amount) AS total_revenue
+    FROM Payments
+    WHERE payment_date BETWEEN p_start_date AND p_end_date;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE GetMemberWithMembership (
+    IN p_member_id INT
+)
+BEGIN
+    SELECT m.*, ms.start_date, ms.end_date, ms.membership_type, ms.fee
+    FROM Members m
+    JOIN Memberships ms ON m.member_id = ms.member_id
+    WHERE m.member_id = p_member_id;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE GetTrainerMembers (
+    IN p_trainer_id INT
+)
+BEGIN
+    SELECT m.member_id, m.name, wp.plan_description
+    FROM Workout_Plans wp
+    JOIN Members m ON wp.member_id = m.member_id
+    WHERE wp.trainer_id = p_trainer_id;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE LogAttendance (
+    IN p_member_id INT,
+    IN p_date DATE,
+    IN p_check_in TIME,
+    IN p_check_out TIME
+)
+BEGIN
+    INSERT INTO Attendance (member_id, date, check_in_time, check_out_time)
+    VALUES (p_member_id, p_date, p_check_in, p_check_out);
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+
